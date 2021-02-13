@@ -2,12 +2,13 @@
 #define ll long long
 #define ld long double
 using namespace std;
-ll mod=((1LL<<62)-1)|(1LL<<62);//位运算求long long上限 
-ll mul_mod(ll a,ll b,ll p){//快速乘，这里用不到 
-	ll ret=a*b-(ll)(a*(ld)b/p+0.5)*p;
-	return ret>=0?ret:(ret+p)%p;
+ll mod=((1LL<<62)-1)|(1LL<<62);//2^63-1
+ll mul_m(ll a,ll b,ll p){
+	ll d=(ll)floor(a*(ld)b/p+0.5);
+	ll ret=a*b-d*p;
+	return ret<0?ret+p:ret;
 }
-ll lowspeed(ll a,ll b,ll p){
+ll mul_m2(ll a,ll b,ll p){
 	ll cur=a,ans=0;
 	while(b){
 		if(b&1) ans=(ans+cur)%p;
@@ -16,18 +17,27 @@ ll lowspeed(ll a,ll b,ll p){
 	}
 	return ans%p;
 }
-ll speed(ll a,ll b,ll p){
+ll pow_m(ll a,ll b,ll p){
 	ll cur=a,ans=1;
 	while(b){
-		if(b&1) ans=lowspeed(ans,cur,p)%p;
-		cur=lowspeed(cur,cur,p)%p;
+		if(b&1) ans=ans*cur%p;
+		cur=cur*cur%p;
+		b>>=1;
+	}
+	return ans%p;
+}
+ll ex_pow_m(ll a,ll b,ll p){
+	ll cur=a,ans=1;
+	while(b){
+		if(b&1) ans=mul_m(ans,cur,p)%p;
+		cur=mul_m(cur,cur,p)%p;
 		b>>=1;
 	}
 	return ans%p;
 }
 int main(){
 	cout<<mod<<endl;
-	cout<<mul_mod(1000000000,1555555555555,1000000007)<<endl;
-	cout<<speed(2,61,mod)<<endl;
+	cout<<mul_m(2,3,5)<<endl;
+	cout<<pow_m(2,61,mod)<<endl;
 	return 0;
 }
