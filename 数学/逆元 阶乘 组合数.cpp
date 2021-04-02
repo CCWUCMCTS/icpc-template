@@ -8,7 +8,7 @@ ll n,_inv[MAXN+20];
 ll gcd(ll a,ll b){
 	return b==0?a:gcd(b,a%b);
 }
-ll speed(ll a,ll b,ll p){//ÈômodÎªÖÊÊı£¬ÄæÔªspeed(b,mod-2,mod) 
+ll speed(ll a,ll b,ll p){//è‹¥modä¸ºè´¨æ•°ï¼Œé€†å…ƒspeed(b,mod-2,mod) 
 	ll cur=a,ans=1;
 	while(b){
 		if(b&1) ans=ans*cur%p;
@@ -17,16 +17,26 @@ ll speed(ll a,ll b,ll p){//ÈômodÎªÖÊÊı£¬ÄæÔªspeed(b,mod-2,mod)
 	}
 	return ans%p;
 }
-ll exgcd(ll a,ll b,ll &x,ll &y){//À©Õ¹Å·¼¸ÀïµÃËã·¨£¬Ê¹ÓÃÊ±×¢Òâ+modÔÙ%mod 
-    if(b==0){//µİ¹é±ß½ç 
+void exgcd(ll a,ll b,ll &x,ll &y){
+    if (!b) return (void)(x=1,y=0);
+    exgcd(b,a%b,x,y);
+    ll tmp=x;x=y;y=tmp-a/b*y;
+}
+inline ll INV(ll a,ll p){
+    ll x,y;
+    exgcd(a,p,x,y);
+    return (x%p+p)%p;
+}
+ll exgcd_0(ll a,ll b,ll &x,ll &y){//æ‰©å±•æ¬§å‡ é‡Œå¾—ç®—æ³•ï¼Œä½¿ç”¨æ—¶æ³¨æ„+modå†%mod 
+    if(b==0){//é€’å½’è¾¹ç•Œ 
         x=1;y=0;
         return a;
     }
-    ll ret=exgcd(b,a%b,x,y);
-    ll tmp=y;//Çó½âÔ­x,y     
+    ll ret=exgcd_0(b,a%b,x,y);
+    ll tmp=y;//æ±‚è§£åŸx,y     
     y=x-a/b*y;
     x=tmp;
-    return ret;//·µ»Øgcd      
+    return ret;//è¿”å›gcd      
 }
 void pre(ll p){
 	_inv[0]=_inv[1]=1;
@@ -34,7 +44,7 @@ void pre(ll p){
 		_inv[i]=((p-p/i)*_inv[p%i])%p;
 	}
 }
-ll Scomb(ll _n,ll _m,ll p){//SmallCombination n,m¿ÉÒÔÏßĞÔÇó³ö 
+ll Scomb(ll _n,ll _m,ll p){//SmallCombination n,må¯ä»¥çº¿æ€§æ±‚å‡º 
 	if(_m==0) return 1;
 	ll ans=1,tmp=1;
 	for(ll i=_m+1;i<=_n;i++){
@@ -44,7 +54,7 @@ ll Scomb(ll _n,ll _m,ll p){//SmallCombination n,m¿ÉÒÔÏßĞÔÇó³ö
 		tmp=(tmp*i)%p;
 	}
 	//cout<<tmp<<endl;
-	return ans*inv(tmp%p,p)%p;
+	return ans*INV(tmp%p,p)%p;
 }
 ll Bcomb(ll _n,ll _m,ll p){//BigCombination
 	if(_n<p&&_m<p) return Scomb(_n,_m,p)%p;
