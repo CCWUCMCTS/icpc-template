@@ -1,75 +1,71 @@
-#define MAXN 100
+#include<bits/stdc++.h>
+using namespace std;
+#define MAXN 120
 #define fabs(x) ((x)>0?(x):-(x))
 #define eps 1e-10
 //列主元gauss消去求解a[][]x[]=b[]
 //返回是否有唯一解,若有解在b[]中
-int gauss_cpivot(int n,double a[][MAXN],double b[]){
-	int i,j,k,row;
-	double maxp,t;
-	for (k=0;k<n;k++){
-		for (maxp=0,i=k;i<n;i++)
-			if (fabs(a[i][k])>fabs(maxp))
-				maxp=a[row=i][k];
-		if (fabs(maxp)<eps)
-			return 0;
-		if (row!=k){
-			for (j=k;j<n;j++)
-				t=a[k][j],a[k][j]=a[row][j],a[row][j]=t;
-			t=b[k],b[k]=b[row],b[row]=t;
-		}
-		for (j=k+1;j<n;j++){
-			a[k][j]/=maxp;
-			for (i=k+1;i<n;i++)
-				a[i][j]-=a[i][k]*a[k][j];
-		}
-		b[k]/=maxp;
-		for (i=k+1;i<n;i++)
-			b[i]-=b[k]*a[i][k];
-	}
-	for (i=n-1;i>=0;i--)
-		for (j=i+1;j<n;j++)
-			b[i]-=a[i][j]*b[j];
-	return 1;
+// a[N][N]是增广矩阵
+int n;
+double a[120][120],b[120];
+int gauss()
+{
+    int c, r;
+    for (c = 0, r = 0; c < n; c ++ )
+    {
+        int t = r;
+        for (int i = r; i < n; i ++ )   // 找到绝对值最大的行
+            if (fabs(a[i][c]) > fabs(a[t][c]))
+                t = i;
+
+        if (fabs(a[t][c]) < eps) continue;
+
+        for (int i = c; i <= n; i ++ ) swap(a[t][i], a[r][i]);      // 将绝对值最大的行换到最顶端
+        for (int i = n; i >= c; i -- ) a[r][i] /= a[r][c];      // 将当前行的首位变成1
+        for (int i = r + 1; i < n; i ++ )       // 用当前行将下面所有的列消成0
+            if (fabs(a[i][c]) > eps)
+                for (int j = n; j >= c; j -- )
+                    a[i][j] -= a[r][j] * a[i][c];
+
+        r ++ ;
+    }
+
+    if (r < n)
+    {
+        for (int i = r; i < n; i ++ )
+            if (fabs(a[i][n]) > eps)
+                return 2; // 无解
+        return 1; // 有无穷多组解
+    }
+
+    for (int i = n - 1; i >= 0; i -- )
+        for (int j = i + 1; j < n; j ++ )
+            a[i][n] -= a[i][j] * a[j][n];
+
+    return 0; // 有唯一解
 }
-//全主元gauss消去解a[][]x[]=b[]
-//返回是否有唯一解,若有解在b[]中
-int gauss_tpivot(int n,double a[][MAXN],double b[]){
-	int i,j,k,row,col,index[MAXN];
-	double maxp,t;
-	for (i=0;i<n;i++)
-		index[i]=i;
-	for (k=0;k<n;k++){
-        for (maxp=0,i=k;i<n;i++)
-			for (j=k;j<n;j++)
-				if (fabs(a[i][j])>fabs(maxp))
-					maxp=a[row=i][col=j];
-        if (fabs(maxp)<eps)
-			return 0;
-		if (col!=k){
-			for (i=0;i<n;i++)
-				t=a[i][col],a[i][col]=a[i][k],a[i][k]=t;
-			j=index[col],index[col]=index[k],index[k]=j;
+
+
+int main(){
+	scanf("%d",&n);
+	for(int i=0;i<n;i++){
+		for(int j=0;j<n;j++){
+			scanf("%d",&a[i][j]);
 		}
-		if (row!=k){
-			for (j=k;j<n;j++)
-                t=a[k][j],a[k][j]=a[row][j],a[row][j]=t;
-			t=b[k],b[k]=b[row],b[row]=t;
-		}
-		for (j=k+1;j<n;j++){
-			a[k][j]/=maxp;
-			for (i=k+1;i<n;i++)
-				a[i][j]-=a[i][k]*a[k][j];
-		}
-		b[k]/=maxp;
-		for (i=k+1;i<n;i++)
-			b[i]-=b[k]*a[i][k];
+		scanf("%d",&b[i]);
+		
 	}
-	for (i=n-1;i>=0;i--)
-		for (j=i+1;j<n;j++)
-			b[i]-=a[i][j]*b[j];
-	for (k=0;k<n;k++)
-		a[0][index[k]]=b[k];
-	for (k=0;k<n;k++)
-		b[k]=a[0][k];
-	return 1;
+	int res = gauss();
+	if(res==0){
+		for(int i=1;i<=n;i++){
+			printf("%.2f\n",b[i]);
+		}
+	}
+	else if(res==1){
+		printf("Infinite group solutions\n");
+	}
+	else{
+		printf("No solution\n");
+	}
+	return 0;
 }
